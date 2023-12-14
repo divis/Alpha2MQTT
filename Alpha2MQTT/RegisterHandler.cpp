@@ -1680,6 +1680,7 @@ modbusRequestAndResponseStatusValues RegisterHandler::readHandledRegister(uint16
 		// Not a valid register we have written code to handle, do something here to prevent the send
 		result = modbusRequestAndResponseStatusValues::notHandledRegister;
 		strcpy(rs->statusMqttMessage, MODBUS_REQUEST_AND_RESPONSE_NOT_HANDLED_REGISTER_MQTT_DESC);
+		strcpy(rs->displayMessage, MODBUS_REQUEST_AND_RESPONSE_NOT_HANDLED_REGISTER_DISPLAY_DESC);
 		break;
 	}
 	}
@@ -1757,16 +1758,16 @@ modbusRequestAndResponseStatusValues RegisterHandler::readHandledRegister(uint16
 														pvPower
 														-
 														// Minus feeding, if feeding
-														(gridPower < 0 ? abs(gridPower) : 0)
+														(gridPower < 0 ? (int32_t)abs(gridPower) : (int32_t)0)
 														+
 														// Plus purchase, if purchasing
-														(gridPower > 0 ? gridPower : 0)
+														(gridPower > 0 ? gridPower : (int32_t)0)
 														-
 														// Minus battery, if charging
-														(batteryPower < 0 ? abs(batteryPower) : 0)
+														(batteryPower < 0 ? (int32_t)abs(batteryPower) : (int32_t)0)
 														+
 														// Plus battery, if discharging
-														(batteryPower > 0 ? batteryPower : 0);
+														((int32_t)batteryPower > 0 ? (int32_t)batteryPower : (int32_t)0);
 
 													rs->dataSize = 4;
 													rs->data[0] = rs->signedIntValue >> 24;
