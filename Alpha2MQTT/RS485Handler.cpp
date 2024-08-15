@@ -1,6 +1,6 @@
 /*
 Name:		RS485Handler.cpp
-Created:	8/24/2022
+Created:	24/Aug/2022
 Author:		Daniel Young
 
 This file is part of Alpha2MQTT (A2M) which is released under GNU GENERAL PUBLIC LICENSE.
@@ -30,7 +30,7 @@ RS485Handler::RS485Handler()
 	_RS485Serial->begin(DEFAULT_BAUD_RATE, SWSERIAL_8N1);
 #elif defined MP_ESP32
 	_RS485Serial = new HardwareSerial(2); // Serial 2 PIN16=RXgreen, pin17=TXwhite
-	_RS485Serial->begin(DEFAULT_BAUD_RATE, SERIAL_8N1);
+	_RS485Serial->begin(DEFAULT_BAUD_RATE, SERIAL_8N1, 16, 17);
 #endif
 	
 }
@@ -102,6 +102,11 @@ modbusRequestAndResponseStatusValues RS485Handler::sendModbus(uint8_t frame[], b
 {
 	//Calculate the CRC and overwrite the last two bytes.
 	calcCRC(frame, actualFrameSize);
+
+	// After some liaison with a user of Alpha2MQTT on a 115200 baud rate, this fixed inconsistent retrieval
+#ifdef REQUIRE_DELAY_DUE_TO_INCONSISTENT_RETRIEVAL
+	delay(REQUIRED_DELAY_DUE_TO_INCONSISTENT_RETRIEVAL);
+#endif
 
 	// Make sure there are no spurious characters in the in/out buffer.
 	flushRS485();
